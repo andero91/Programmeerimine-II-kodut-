@@ -1,2 +1,2 @@
-# Programmeerimine-II-kodut-
+# Programmeerimine-II-kodutöö
 HKI5003.HK kodutöö
