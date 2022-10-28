@@ -586,6 +586,23 @@ app.patch('/api/v1/releasetypes/:id', (req: Request, res: Response) => {
     });
 });
 
+//Väljaande tüübi kustutamine id alusel
+app.delete('/api/v1/releasetypes/:id', (req: Request, res: Response) => {
+    const id = parseInt(req.params.id);
+    const index = releasetypes.findIndex(element => element.id === id);
+    if (index === -1) {
+        return res.status(404).json({
+            success: false,
+            message: `Release type not found`,
+        });
+    }
+    releasetypes.splice(index, 1);
+    return res.status(200).json({
+        success: true,
+        message: `Release type deleted`,
+    });
+});
+
 //Endpoint, mis kontrollib kas API töötab
 app.get('/api/v1/health', (req: Request, res: Response) => {
   res.status(200).json({
