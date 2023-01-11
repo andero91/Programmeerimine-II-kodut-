@@ -3,6 +3,7 @@ import { IRecordCompany } from "./components/recordcompanies/interfaces"
 import { IRelease } from "./components/releases/interfaces"
 import { ITrack } from "./components/tracks/interfaces"
 import { IReleaseType } from "./components/releasetypes/interfaces"
+import { IUser } from "./components/users/interfaces"
 
 //Artistide massiiv
 const artists: IArtist[] = [
@@ -58,4 +59,22 @@ const releasetypes: IReleaseType[] = [
     }
 ];
 
-export { artists, recordCompanies, releases, tracks, releasetypes };
+//Kasutajate massiiv
+const users: IUser[] = [
+    {
+        id: 1,
+        email: "test@test.ee",
+        username: "admin",
+        password: "$2b$10$jWtRQfv2AA4a75U/cYdG1u0svCtwfAQwzfgHbXdynNwzuif2uqm7u",
+        role: "Admin",
+    },
+    {
+        id: 2,
+        email: "tavakasutaja@test.ee",
+        username: "user1",
+        password: "$2b$10$jWtRQfv2AA4a75U/cYdG1u0svCtwfAQwzfgHbXdynNwzuif2uqm7u",
+        role: "User",
+    },
+];
+
+export { artists, recordCompanies, releases, tracks, releasetypes, users };
