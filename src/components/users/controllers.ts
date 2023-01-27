@@ -3,17 +3,17 @@ import { IUser, INewUser } from "./interfaces";
 import usersServices from "./services";
 
 const usersControllers = {
-    getAllUsers: (req: Request, res: Response) => {
-        const allUsers = usersServices.getAllUsers();
+    getAllUsers: async (req: Request, res: Response) => {
+        const allUsers = await usersServices.getAllUsers();
         res.status(200).json({
             success: true,
             message: 'List of users',
             users: allUsers,
         });
     },
-    getUserById: (req: Request, res: Response) => {
+    getUserById: async (req: Request, res: Response) => {
         const id = parseInt(req.params.id);
-        let user: IUser | undefined = usersServices.findUserById(id);
+        let user = await usersServices.findUserById(id);
 
         if (!user) {
             return res.status(404).json({
@@ -42,10 +42,10 @@ const usersControllers = {
             message: `User ${newUser.username} with id ${id} created`,
         });
     },
-    updateUser: (req: Request, res: Response) => {
+    updateUser: async (req: Request, res: Response) => {
         const id = parseInt(req.params.id);
         const { email, username, password, role } = req.body;
-        const user: IUser | undefined = usersServices.findUserById(id);
+        const user = await usersServices.findUserById(id);
         if (!user) {
             return res.status(404).json({
                 success: false,
@@ -74,15 +74,16 @@ const usersControllers = {
             message: `User updated`,
         });
     },
-    deleteUser: (req: Request, res: Response) => {
+    deleteUser: async (req: Request, res: Response) => {
         const id = parseInt(req.params.id);
-        const result = usersServices.deleteUser(id);
-        if (!result) {
+        const user = await usersServices.findUserById(id);
+        if (!user) {
             return res.status(404).json({
                 success: false,
                 message: `User not found`,
             });
         }
+
         return res.status(200).json({
             success: true,
             message: `User deleted`,

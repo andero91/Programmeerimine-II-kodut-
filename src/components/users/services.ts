@@ -1,51 +1,53 @@
 //Kasutajatega seotud endpointid
 
-import { users } from "../../mockData";
+import pool from "../../database";
 import authServices from "../auth/services";
 import { IUser, INewUser } from "./interfaces";
 
 const usersServices = {
-    findUserById: (id: number): IUser | undefined => {
-        let user: IUser | undefined = users.find(element => {return element.id === id})
-        return user;
+    findUserById: async (id: number) => {
+        const [user] = await pool.query(`SELECT id, username, email, role FROM Users WHERE id=?;`, [id]);
+        return user[0];
     },
-    findUserByEmail: (email: string): IUser | undefined => {
-        let user: IUser | undefined = users.find(element => {return element.email === email})
-        return user;
+    findUserByEmail: async (email: string) => {
+        const [user] = await pool.query(`SELECT id, email, password, role FROM Users WHERE email=?;`, [email]);
+        return user[0];
     },
-    getAllUsers: () => {
+    getAllUsers: async () => {
+        const [users] = await pool.query('SELECT id, username, email, role FROM Users;');
         return users;
     },
     createUser: async (user: INewUser): Promise<number> => {
-        const id = users.length + 1;
         const hashedPassword = await authServices.hash(user.password);
-        const newUser: IUser = {
-            id,
+        const newUser = {
             email: user.email,
             username: user.username,
             password: hashedPassword,
             role: user.role, //Vaikimisi on uus kasutaja tavakasutaja
         };
-        users.push(newUser);
-        return id;
+        const [result] = await pool.query(`INSERT INTO Users SET ?;`, [newUser]);
+        return result.insertId;
     },
     updateUser: async (userToUpdate: IUser): Promise<Boolean> => {
-        const { id, email, username, password, role } = userToUpdate;
-        const user = usersServices.findUserById(id);
-        if (user && email ) user.email = email;
-        if (user && username ) user.username = username;
-        if (user && password) {
-            const hashedPassword = await authServices.hash(userToUpdate.password);
-            user.password = hashedPassword;
-        } 
-        if (user && role) user.role = role;
-
+        const { id, email, username, role, password } = userToUpdate;
+        const user = await usersServices.findUserById(id);
+        let hashedPassword = null;
+        if (password) {
+            hashedPassword = await authServices.hash(password);
+        };
+        const update = {
+            email: email || user.email,
+            username: username || user.username,
+            role: role || user.role,
+            password: hashedPassword || user.password 
+        };
+        const result = await pool.query(`UPDATE Users SET ? WHERE ID=?;`, [update, id]);
+        console.log(result);
         return true;
     },
-    deleteUser: (id: number): Boolean => {
-        const index = users.findIndex(element => element.id === id);
-        if (index === -1) return false;
-        users.splice(index, 1);
+    deleteUser: async (id: number): Promise<Boolean> => {
+        const result = await pool.query(`DELETE FROM Users WHERE ID=?;`, [id]);
+        console.log(result);
         return true;
     }
 }
