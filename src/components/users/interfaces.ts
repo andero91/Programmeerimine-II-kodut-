@@ -1,4 +1,4 @@
-interface INewUser { // Lugude interface
+interface INewUser { 
     username: string;
     email: string;
     password: string;
